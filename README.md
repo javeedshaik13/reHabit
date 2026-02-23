@@ -451,7 +451,7 @@ OPENAI_API_KEY=sk-...
 
 ## ⚠️ Known Issues
 
-- Mentor request/accept/review endpoints return `501 Not Implemented` (planned)
+- Some UI issues need to be fixed
 - In-memory MongoDB fallback does not persist data between server restarts
 - Some AI features require a valid OpenAI API key with sufficient quota
 
