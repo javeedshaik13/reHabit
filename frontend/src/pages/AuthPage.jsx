@@ -68,6 +68,10 @@ const AuthPage = ({ onLogin }) => {
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
   const handleRoleChange = (value) => setFormData({ ...formData, role: value });
+  const switchTab = (login) => {
+    setIsLogin(login);
+    setFormData({ email: '', password: '', name: '', role: 'user' });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -142,7 +146,7 @@ const AuthPage = ({ onLogin }) => {
                 key={tab}
                 type="button"
                 data-testid={`${tab}-tab`}
-                onClick={() => setIsLogin(tab === 'login')}
+                onClick={() => switchTab(tab === 'login')}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                   (tab === 'login') === isLogin
                     ? 'bg-white text-emerald-700 shadow-md'
@@ -175,6 +179,7 @@ const AuthPage = ({ onLogin }) => {
                       value={formData.email}
                       onChange={handleChange}
                       required
+                      autoComplete="username"
                       data-testid="login-email-input"
                     />
                   </div>
@@ -194,6 +199,7 @@ const AuthPage = ({ onLogin }) => {
                       value={formData.password}
                       onChange={handleChange}
                       required
+                      autoComplete="current-password"
                       data-testid="login-password-input"
                     />
                     <button
@@ -224,7 +230,7 @@ const AuthPage = ({ onLogin }) => {
 
               <p className="text-center text-sm text-slate-500 mt-6">
                 Don't have an account?{' '}
-                <button type="button" onClick={() => setIsLogin(false)} className="text-emerald-600 font-semibold hover:underline">
+                <button type="button" onClick={() => switchTab(false)} className="text-emerald-600 font-semibold hover:underline">
                   Create one
                 </button>
               </p>
@@ -283,6 +289,7 @@ const AuthPage = ({ onLogin }) => {
                       value={formData.name}
                       onChange={handleChange}
                       required
+                      autoComplete="name"
                       data-testid="signup-name-input"
                     />
                   </div>
@@ -302,6 +309,7 @@ const AuthPage = ({ onLogin }) => {
                       value={formData.email}
                       onChange={handleChange}
                       required
+                      autoComplete="off"
                       data-testid="signup-email-input"
                     />
                   </div>
@@ -321,6 +329,7 @@ const AuthPage = ({ onLogin }) => {
                       value={formData.password}
                       onChange={handleChange}
                       required
+                      autoComplete="new-password"
                       data-testid="signup-password-input"
                     />
                     <button
@@ -351,7 +360,7 @@ const AuthPage = ({ onLogin }) => {
 
               <p className="text-center text-sm text-slate-500 mt-6">
                 Already have an account?{' '}
-                <button type="button" onClick={() => setIsLogin(true)} className="text-emerald-600 font-semibold hover:underline">
+                <button type="button" onClick={() => switchTab(true)} className="text-emerald-600 font-semibold hover:underline">
                   Sign in
                 </button>
               </p>
