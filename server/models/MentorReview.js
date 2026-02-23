@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const mentorReviewSchema = new mongoose.Schema({
   mentorId: {
@@ -30,4 +30,4 @@ const mentorReviewSchema = new mongoose.Schema({
 // Ensure one review per user per mentor
 mentorReviewSchema.index({ mentorId: 1, userId: 1 }, { unique: true });
 
-module.exports = mongoose.model('MentorReview', mentorReviewSchema);
+export default mongoose.model('MentorReview', mentorReviewSchema);

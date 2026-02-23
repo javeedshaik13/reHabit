@@ -4,6 +4,7 @@ import Completion from '../models/Completion.js';
 import MentorAssignment from '../models/MentorAssignment.js';
 import Message from '../models/Message.js';
 import MentorRequest from '../models/MentorRequest.js';
+import MentorReview from '../models/MentorReview.js';
 
 // Calculate distance between two coordinates (Haversine formula)
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -333,13 +334,84 @@ const getMentorLeaderboard = async (req, res) => {
   }
 };
 
-// Placeholder for review system
+// POST /api/mentors/:mentorId/review - Submit a review for a mentor
 const submitReview = async (req, res) => {
-  res.status(501).json({ message: 'Reviews feature coming soon' });
+  try {
+    const { rating, comment } = req.body;
+    const mentorId = req.params.mentorId;
+    const userId = req.user._id;
+
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+    }
+
+    // Verify mentor exists
+    const mentor = await User.findById(mentorId);
+    if (!mentor || mentor.role !== 'mentor') {
+      return res.status(404).json({ message: 'Mentor not found' });
+    }
+
+    // Must have an accepted request with this mentor
+    const accepted = await MentorRequest.findOne({
+      userId,
+      mentorId,
+      status: 'accepted'
+    });
+    if (!accepted) {
+      return res.status(403).json({ message: 'You can only review a mentor you are assigned to' });
+    }
+
+    // Upsert review (one per user per mentor)
+    const review = await MentorReview.findOneAndUpdate(
+      { mentorId, userId },
+      { rating, comment: comment || '', mentorId, userId },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    ).populate('userId', 'name avatar');
+
+    // Recalculate mentor's average rating
+    const allReviews = await MentorReview.find({ mentorId });
+    const avgRating = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+
+    await User.findByIdAndUpdate(mentorId, {
+      'mentorProfile.rating': Math.round(avgRating * 10) / 10,
+      'mentorProfile.totalReviews': allReviews.length
+    });
+
+    console.log(`Review submitted for mentor ${mentorId} by user ${userId}`);
+    res.status(201).json(review);
+  } catch (error) {
+    console.error('Error submitting review:', error);
+    res.status(500).json({ message: error.message });
+  }
 };
 
+// GET /api/mentors/:mentorId/reviews - Get reviews for a mentor
 const getMentorReviews = async (req, res) => {
-  res.json({ reviews: [], total: 0, page: 1, pages: 0 });
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const mentorId = req.params.mentorId;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const [reviews, total] = await Promise.all([
+      MentorReview.find({ mentorId })
+        .populate('userId', 'name avatar')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .lean(),
+      MentorReview.countDocuments({ mentorId })
+    ]);
+
+    res.json({
+      reviews,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / parseInt(limit))
+    });
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // Placeholder for client management
