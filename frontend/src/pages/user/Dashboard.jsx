@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import PlantGrowthCard from '@/components/PlantGrowthCard';
 import LevelUpAnimation from '@/components/LevelUpAnimation';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
+import CompactHeatmap from '@/components/CompactHeatmap';
 import FriendsWidget from '@/components/FriendsWidget';
 import { API } from '@/lib/config';
 
@@ -305,15 +306,18 @@ const UserDashboard = ({ user, onLogout }) => {
             </CardContent>
           </Card>
         )}
+
+        {/* Activity Heatmap (Compact) */}
+        <CompactHeatmap />
         
-        {/* Analytics Demo */}
+        {/* Analytics Dashboard */}
         <Card>
           <CardHeader>
-            <CardTitle>Analytics Preview</CardTitle>
-            <CardDescription>Demo analytics powered by mock data</CardDescription>
+            <CardTitle>Your Analytics</CardTitle>
+            <CardDescription>Track your habit consistency and performance metrics</CardDescription>
           </CardHeader>
           <CardContent>
-            <AnalyticsDashboard demo={true} />
+            <AnalyticsDashboard />
           </CardContent>
         </Card>
       </div>

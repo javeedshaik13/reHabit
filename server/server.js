@@ -84,20 +84,48 @@ mongoose.set('bufferCommands', false);
 mongoose.set('strictQuery', false); // optional, keep default behavior
 
 async function connectDb() {
+  // If no URI configured, fall back to in-memory DB for development
   if (!MONGO_URI) {
-    console.warn('No MONGO_URI provided — running without DB connection. To enable DB, set MONGO_URI in server/.env or provide MONGO_USER/MONGO_PASS/MONGO_HOST/MONGO_DB.');
-    return;
+    console.warn('No MONGO_URI provided — attempting to start an in-memory MongoDB for development.');
+    try {
+      const { MongoMemoryServer } = await import('mongodb-memory-server');
+      const mongod = await MongoMemoryServer.create();
+      const uri = mongod.getUri();
+      await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+      console.log('Connected to in-memory MongoDB');
+      // expose the in-memory server so it can be stopped later if needed
+      app.set('mongod', mongod);
+      return;
+    } catch (memErr) {
+      console.error('Failed to start in-memory MongoDB:', memErr && memErr.message);
+      return; // continue without DB
+    }
   }
+
   try {
     // set a reasonable server selection timeout so failures surface quickly
     await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 5000 });
     console.log('MongoDB connected');
   } catch (err) {
     // improve error messages for common issues
-    console.warn('MongoDB connection failed, continuing without DB:', err.message);
-    if (/auth|bad auth|Authentication failed/i.test(err.message)) {
-      console.warn('MongoDB authentication failed. Check MONGO_URI or MONGO_USER/MONGO_PASS in server/.env.');
-      console.warn('If you intended to run locally, set MONGO_URI=mongodb://127.0.0.1:27017/rehabit (start a local mongod).');
+    console.warn('MongoDB connection failed:', err && err.message);
+
+    // If connection fails (e.g., ETIMEDOUT, auth issues), attempt an in-memory fallback so dev can continue
+    try {
+      console.warn('Attempting to start an in-memory MongoDB as a fallback...');
+      const { MongoMemoryServer } = await import('mongodb-memory-server');
+      const mongod = await MongoMemoryServer.create();
+      const uri = mongod.getUri();
+      await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
+      console.log('Connected to in-memory MongoDB (fallback)');
+      app.set('mongod', mongod);
+    } catch (memErr) {
+      console.error('Failed to start in-memory MongoDB fallback:', memErr && memErr.message);
+      if (/auth|bad auth|Authentication failed/i.test(err.message)) {
+        console.warn('MongoDB authentication failed. Check MONGO_URI or MONGO_USER/MONGO_PASS in server/.env.');
+        console.warn('If you intended to run locally, set MONGO_URI=mongodb://127.0.0.1:27017/rehabit (start a local mongod).');
+      }
+      // leave process running without DB (app uses sample data)
     }
   }
 }
@@ -169,6 +197,7 @@ app.use('/api/gamification', gamificationRoutes);
 app.use('/api/mentors', mentorRoutes);
 // backward-compatible alias
 app.use('/api/mentor', mentorRoutes);
+app.use('/api/mentor-plans', mentorPlanRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);

@@ -120,8 +120,222 @@ const getAIInsights = async (req, res) => {
   }
 };
 
+const getMonthlyHeatmap = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { year = new Date().getFullYear(), month = new Date().getMonth() } = req.query;
+
+    // Convert to numbers
+    const yearNum = parseInt(year);
+    const monthNum = parseInt(month);
+
+    // Get first and last day of the month
+    const firstDay = new Date(yearNum, monthNum, 1);
+    const lastDay = new Date(yearNum, monthNum + 1, 0);
+
+    // Fetch all completions for this month
+    const completions = await Completion.find({
+      userId,
+      completedAt: {
+        $gte: firstDay,
+        $lte: lastDay
+      }
+    })
+      .populate('habitId', 'title category')
+      .sort({ completedAt: -1 })
+      .lean();
+
+    // Group completions by date
+    const completionsByDate = {};
+    completions.forEach(completion => {
+      const date = new Date(completion.completedAt);
+      const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
+      
+      if (!completionsByDate[dateStr]) {
+        completionsByDate[dateStr] = {
+          count: 0,
+          habits: [],
+          completions: []
+        };
+      }
+      
+      completionsByDate[dateStr].count++;
+      if (completion.habitId && completion.habitId.title) {
+        completionsByDate[dateStr].habits.push({
+          id: completion.habitId._id,
+          title: completion.habitId.title,
+          category: completion.habitId.category
+        });
+      }
+      completionsByDate[dateStr].completions.push({
+        time: completion.completedAt,
+        mood: completion.mood || '',
+        notes: completion.notes || ''
+      });
+    });
+
+    // Get habit streaks for context
+    const habits = await Habit.find({ userId, isActive: true })
+      .select('title streak category')
+      .lean();
+
+    const heatmapData = {
+      year: yearNum,
+      month: monthNum,
+      data: completionsByDate,
+      habits: habits,
+      totalCompletions: completions.length
+    };
+
+    return res.json(heatmapData);
+  } catch (error) {
+    console.error('getMonthlyHeatmap error:', error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const getAnalyticsConsistency = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    
+    // Get last 12 months of data
+    const data = [];
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      
+      const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+      const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+      
+      const completions = await Completion.countDocuments({
+        userId,
+        completedAt: { $gte: monthStart, $lte: monthEnd }
+      });
+
+      const habits = await Habit.countDocuments({
+        userId,
+        isActive: true,
+        createdAt: { $lte: monthEnd }
+      });
+
+      // Calculate consistency percentage (completions / (habits * days in month))
+      const daysInMonth = monthEnd.getDate();
+      const maxPossible = Math.max(habits * daysInMonth, 1);
+      const percentage = Math.round((completions / maxPossible) * 100);
+
+      data.push({
+        month: date.toLocaleString('en-US', { month: 'short' }),
+        percentage: Math.min(percentage, 100),
+        completions
+      });
+    }
+
+    return res.json({ data });
+  } catch (error) {
+    console.error('getAnalyticsConsistency error:', error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const getAnalyticsMetrics = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    
+    // Get total habits, completions, and streaks
+    const habits = await Habit.find({ userId, isActive: true }).lean();
+    const totalHabits = habits.length;
+    const totalCompletions = await Completion.countDocuments({ userId });
+    const avgStreak = totalHabits > 0 ? Math.round(habits.reduce((sum, h) => sum + (h.streak || 0), 0) / totalHabits) : 0;
+    const maxStreak = totalHabits > 0 ? Math.max(...habits.map(h => h.streak || 0)) : 0;
+
+    // Calculate engagement (recent activity)
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const recentCompletions = await Completion.countDocuments({
+      userId,
+      completedAt: { $gte: weekAgo }
+    });
+    const engagement = Math.round((recentCompletions / 7) * 100);
+
+    // Calculate growth (compare last month vs previous month)
+    const thisMonthStart = new Date();
+    thisMonthStart.setDate(1);
+    const thisMonthEnd = new Date(thisMonthStart.getFullYear(), thisMonthStart.getMonth() + 1, 0);
+    
+    const lastMonthStart = new Date();
+    lastMonthStart.setMonth(lastMonthStart.getMonth() - 1);
+    lastMonthStart.setDate(1);
+    const lastMonthEnd = new Date(lastMonthStart.getFullYear(), lastMonthStart.getMonth() + 1, 0);
+
+    const thisMonthCompletions = await Completion.countDocuments({
+      userId,
+      completedAt: { $gte: thisMonthStart, $lte: thisMonthEnd }
+    });
+
+    const lastMonthCompletions = await Completion.countDocuments({
+      userId,
+      completedAt: { $gte: lastMonthStart, $lte: lastMonthEnd }
+    });
+
+    const growthCurve = lastMonthCompletions > 0 
+      ? Math.round((thisMonthCompletions / lastMonthCompletions) * 100)
+      : 100;
+
+    return res.json({
+      data: {
+        Consistency: Math.min(avgStreak * 10, 100),
+        Difficulty: Math.round((totalHabits / 10) * 100),
+        Engagement: Math.min(engagement, 100),
+        'Growth Curve': Math.min(growthCurve, 100),
+        Stability: Math.round((maxStreak / 100) * 100),
+        Performance: Math.round((totalCompletions / Math.max(totalHabits * 30, 1)) * 100)
+      }
+    });
+  } catch (error) {
+    console.error('getAnalyticsMetrics error:', error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+const getAnalyticsFeedback = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    
+    // Count positive (completed) vs negative (missed) habits
+    const totalHabits = await Habit.countDocuments({ userId, isActive: true });
+    const totalCompletions = await Completion.countDocuments({ userId });
+    
+    // Estimate based on completion rate over last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const recentCompletions = await Completion.countDocuments({
+      userId,
+      completedAt: { $gte: thirtyDaysAgo }
+    });
+
+    const maxPossible = totalHabits * 30;
+    const positive = Math.round((recentCompletions / Math.max(maxPossible, 1)) * 100);
+    const negative = 100 - positive;
+
+    return res.json({
+      data: {
+        positive: Math.max(positive, 0),
+        negative: Math.max(negative, 0)
+      }
+    });
+  } catch (error) {
+    console.error('getAnalyticsFeedback error:', error);
+    return res.status(500).json({ message: error.message });
+  }
+};
+
 export default {
   getUserStats,
   getLeaderboard,
-  getAIInsights
+  getAIInsights,
+  getMonthlyHeatmap,
+  getAnalyticsConsistency,
+  getAnalyticsMetrics,
+  getAnalyticsFeedback
 };

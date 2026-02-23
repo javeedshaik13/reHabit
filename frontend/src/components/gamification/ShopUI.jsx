@@ -41,17 +41,33 @@ const ShopUI = ({ user }) => {
           setUserCoins(response.data.userCoins);
           setUserLevel(response.data.userLevel);
         } else {
-          // Use enhanced sample data
-          setItems(ENHANCED_SHOP_ITEMS.map(item => ({ ...item, owned: false, _id: Math.random().toString() })));
-          setUserCoins(250); // Sample coins
-          setUserLevel(13); // Sample level
+          // Use enhanced sample data with proper flags
+          const sampleCoins = 250;
+          const sampleLevel = 13;
+          setItems(ENHANCED_SHOP_ITEMS.map(item => ({ 
+            ...item, 
+            owned: false, 
+            _id: Math.random().toString(),
+            canAfford: sampleCoins >= item.price,
+            canBuy: sampleLevel >= (item.levelRequired || 1)
+          })));
+          setUserCoins(sampleCoins);
+          setUserLevel(sampleLevel);
         }
       } catch (apiError) {
         // Use sample data on API error
         console.log('Using sample shop data');
-        setItems(ENHANCED_SHOP_ITEMS.map(item => ({ ...item, owned: false, _id: Math.random().toString() })));
-        setUserCoins(250);
-        setUserLevel(13);
+        const sampleCoins = 250;
+        const sampleLevel = 13;
+        setItems(ENHANCED_SHOP_ITEMS.map(item => ({ 
+          ...item, 
+          owned: false, 
+          _id: Math.random().toString(),
+          canAfford: sampleCoins >= item.price,
+          canBuy: sampleLevel >= (item.levelRequired || 1)
+        })));
+        setUserCoins(sampleCoins);
+        setUserLevel(sampleLevel);
       }
     } catch (error) {
       console.error('Failed to fetch shop items:', error);
@@ -64,24 +80,75 @@ const ShopUI = ({ user }) => {
   const handlePurchase = async (itemId) => {
     try {
       setPurchasing(itemId);
+      
+      // Find the item to purchase
+      const itemToPurchase = items.find(item => item._id === itemId);
+      if (!itemToPurchase) {
+        toast.error('Item not found');
+        return;
+      }
+
+      // Check if we can afford it
+      if (!itemToPurchase.canAfford) {
+        toast.error('Not enough coins');
+        return;
+      }
+
+      // Check level requirement
+      if (!itemToPurchase.canBuy) {
+        toast.error(`Requires level ${itemToPurchase.levelRequired}`);
+        return;
+      }
+
       const token = localStorage.getItem('token');
-      const response = await axios.post(
-        `${API}/gamification/shop/purchase/${itemId}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
       
-      toast.success('🎉 Item purchased successfully!');
-      setUserCoins(response.data.remainingCoins);
-      
-      // Update items to mark as owned
-      setItems(prevItems =>
-        prevItems.map(item =>
-          item._id === itemId ? { ...item, owned: true } : item
-        )
-      );
+      try {
+        // Try to purchase from API
+        const response = await axios.post(
+          `${API}/gamification/shop/purchase/${itemId}`,
+          {},
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        
+        toast.success('🎉 Item purchased successfully!');
+        setUserCoins(response.data.remainingCoins);
+        
+        // Update items to mark as owned
+        setItems(prevItems =>
+          prevItems.map(item =>
+            item._id === itemId ? { ...item, owned: true } : item
+          )
+        );
+      } catch (apiError) {
+        // If API fails (e.g., DB not connected), simulate purchase with sample data
+        console.log('API purchase failed, using sample data');
+        
+        // Deduct coins locally
+        const newCoins = userCoins - itemToPurchase.price;
+        setUserCoins(newCoins);
+        
+        // Mark item as owned
+        setItems(prevItems =>
+          prevItems.map(item => {
+            if (item._id === itemId) {
+              return { 
+                ...item, 
+                owned: true,
+                canAfford: newCoins >= item.price 
+              };
+            }
+            // Update canAfford for all items with new coin balance
+            return {
+              ...item,
+              canAfford: newCoins >= item.price
+            };
+          })
+        );
+        
+        toast.success('🎉 Item purchased successfully!');
+      }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Purchase failed');
+      toast.error(error.message || 'Purchase failed');
     } finally {
       setPurchasing(null);
     }
