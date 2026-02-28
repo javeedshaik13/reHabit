@@ -111,14 +111,19 @@ const MySubscriptions = ({ user, onLogout }) => {
       <Layout user={user} onLogout={onLogout} role="user">
         <div className="space-y-6 mt-5">
           <h1 className="text-3xl font-bold" style={{ fontFamily: 'Rethink Sans, sans-serif' }}>My Subscriptions</h1>
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <Users className="w-16 h-16 text-slate-300 mb-4" />
-              <h3 className="text-xl font-semibold text-slate-600 mb-2">No Active Subscriptions</h3>
-              <p className="text-slate-500 text-center max-w-md mb-4">
+          <Card className="border border-slate-200 shadow-sm">
+            <CardContent className="flex flex-col items-center justify-center text-center py-16 px-6">
+              <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-5">
+                <Users className="w-10 h-10 text-slate-300" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-700 mb-2">No Active Subscriptions</h3>
+              <p className="text-slate-500 max-w-xs mb-6">
                 You don't have any mentor subscriptions yet. Browse available mentors and choose a plan to get started!
               </p>
-              <Button onClick={() => window.location.href = '/user/mentors'} className="mt-4">
+              <Button
+                onClick={() => window.location.href = '/user/mentors'}
+                className="gap-2 px-6 py-2.5 bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white border-0 rounded-xl shadow-md font-semibold transition-all duration-200"
+              >
                 Browse Mentors
               </Button>
             </CardContent>

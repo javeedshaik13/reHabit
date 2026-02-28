@@ -341,36 +341,36 @@ const GamificationPage = ({ user, onLogout }) => {
   return (
     <Layout user={user} onLogout={onLogout} role="user">
       {/* Welcome Animation */}
-      <div className="container space-y-6 pb-12">
+      <div className="space-y-4 sm:space-y-6 pb-10 px-1 sm:px-0">
         {/* Welcome Banner */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="hero-banner mb-6 text-slate-800"
+          className="hero-banner mb-4 sm:mb-6 text-slate-800"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <h2 className="text-4xl font-bold text-slate-800" style={{ fontFamily: 'Rethink Sans, sans-serif' }}>🎉 Welcome to Your Gamification Hub!</h2>
-              <p className="text-slate-600 mt-1" style={{ fontFamily: 'Spectral, serif' }}>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl sm:text-3xl font-bold text-slate-800 leading-tight" style={{ fontFamily: 'Rethink Sans, sans-serif' }}>🎉 Welcome to Your Gamification Hub!</h2>
+              <p className="text-slate-600 mt-1 text-xs sm:text-base" style={{ fontFamily: 'Spectral, serif' }}>
                 All data is loaded from your account. Complete habits to earn rewards!
               </p>
             </div>
 
             {/* Quick stats */}
-            <div className="flex gap-2 ml-6">
+            <div className="flex gap-2">
               <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white">
-                <CardContent className="p-3 flex flex-col items-center justify-center text-center min-w-[88px]">
-                  <Star className="w-5 h-5 mb-0.5" />
-                  <div className="text-xl font-bold leading-snug">{gamificationData?.level || 1}</div>
-                  <div className="text-[10px] tracking-wide opacity-85">Level</div>
+                <CardContent className="p-2 sm:p-3 flex flex-col items-center justify-center text-center min-w-[68px] sm:min-w-[88px]">
+                  <Star className="w-4 h-4 sm:w-5 sm:h-5 mb-0.5" />
+                  <div className="text-lg sm:text-xl font-bold leading-snug">{gamificationData?.level || 1}</div>
+                  <div className="text-[9px] sm:text-[10px] tracking-wide opacity-85">Level</div>
                 </CardContent>
               </Card>
 
               <Card className="bg-gradient-to-br from-teal-500 to-cyan-500 text-white">
-                <CardContent className="p-3 flex flex-col items-center justify-center text-center min-w-[88px]">
-                  <Coins className="w-5 h-5 mb-0.5" />
-                  <div className="text-xl font-bold leading-snug">{gamificationData?.coins || 0}</div>
-                  <div className="text-[10px] tracking-wide opacity-85">Coins</div>
+                <CardContent className="p-2 sm:p-3 flex flex-col items-center justify-center text-center min-w-[68px] sm:min-w-[88px]">
+                  <Coins className="w-4 h-4 sm:w-5 sm:h-5 mb-0.5" />
+                  <div className="text-lg sm:text-xl font-bold leading-snug">{gamificationData?.coins || 0}</div>
+                  <div className="text-[9px] sm:text-[10px] tracking-wide opacity-85">Coins</div>
                 </CardContent>
               </Card>
             </div>
@@ -380,30 +380,30 @@ const GamificationPage = ({ user, onLogout }) => {
         {/* Main content tabs */}
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="tabs-list w-full">
-            <TabsTrigger value="overview" className="tabs-trigger flex-1">
-              <Trophy className="w-4 h-4" />
-              <span>Overview</span>
+            <TabsTrigger value="overview" className="tabs-trigger flex-1 text-xs sm:text-sm">
+              <Trophy className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+              <span className="hidden xs:inline sm:inline">Overview</span>
             </TabsTrigger>
 
-            <TabsTrigger value="levelmap" className="tabs-trigger flex-1">
-              <Map className="w-4 h-4" />
-              <span>Level Map</span>
+            <TabsTrigger value="levelmap" className="tabs-trigger flex-1 text-xs sm:text-sm">
+              <Map className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+              <span className="hidden xs:inline sm:inline">Level Map</span>
             </TabsTrigger>
 
-            <TabsTrigger value="shop" className="tabs-trigger flex-1">
-              <ShoppingBag className="w-4 h-4" />
-              <span>Shop</span>
+            <TabsTrigger value="shop" className="tabs-trigger flex-1 text-xs sm:text-sm">
+              <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+              <span className="hidden xs:inline sm:inline">Shop</span>
             </TabsTrigger>
 
-            <TabsTrigger value="challenges" className="tabs-trigger flex-1">
-              <Target className="w-4 h-4" />
-              <span>Challenges</span>
+            <TabsTrigger value="challenges" className="tabs-trigger flex-1 text-xs sm:text-sm">
+              <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+              <span className="hidden xs:inline sm:inline">Challenges</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
-          <TabsContent value="overview" className="mt-6 space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+          <TabsContent value="overview" className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {/* XP Progress */}
               <XPProgressBar
                 currentXP={gamificationData?.displayXP ?? 0}
@@ -421,9 +421,9 @@ const GamificationPage = ({ user, onLogout }) => {
 
             {/* Top Streaks */}
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-slate-800">🔥 Top Streaks</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-800">🔥 Top Streaks</h2>
               {topStreakHabits.length > 0 ? (
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   {topStreakHabits.map((habit) => (
                     <StreakCounter
                       key={habit._id}
@@ -447,7 +447,7 @@ const GamificationPage = ({ user, onLogout }) => {
 
             {/* Stats Overview */}
             <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-slate-800">Your Stats</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Your Stats</h2>
               <GamificationStats
                 stats={gamificationData?.stats}
                 badges={gamificationData?.badges}
@@ -459,7 +459,7 @@ const GamificationPage = ({ user, onLogout }) => {
           <TabsContent value="levelmap" className="mt-6">
             <div className="space-y-6">
               <div>
-                <h2 className="text-3xl font-bold text-slate-800 mb-2">🗺️ Quest Map</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">🗺️ Quest Map</h2>
                 <p className="text-slate-600">Choose your world and conquer the levels!</p>
               </div>
 
@@ -484,15 +484,15 @@ const GamificationPage = ({ user, onLogout }) => {
           {/* Challenges Tab */}
           <TabsContent value="challenges" className="mt-6">
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-slate-800">🎯 Active Challenges</h2>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">🎯 Active Challenges</h2>
                 <div className="text-sm text-slate-600">
                   {challenges.filter(c => c.joined).length} / {challenges.length} Joined
                 </div>
               </div>
 
               {challenges.length > 0 ? (
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {challenges.map((challenge) => (
                     <ChallengeCard
                       key={challenge._id}
@@ -521,23 +521,23 @@ const GamificationPage = ({ user, onLogout }) => {
           </TabsContent>
 
           {/* Shop Tab */}
-          <TabsContent value="shop" className="mt-6 space-y-4">
+          <TabsContent value="shop" className="mt-4 sm:mt-6 space-y-4">
             {/* Theme-matching shop header */}
             <Card className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <ShoppingBag className="w-8 h-8 text-white" />
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <ShoppingBag className="w-6 h-6 sm:w-8 sm:h-8 text-white shrink-0" />
                     <div>
-                      <h2 className="text-3xl font-bold text-white">Item Shop</h2>
-                      <p className="text-white/80">Customize your experience</p>
+                      <h2 className="text-xl sm:text-3xl font-bold text-white">Item Shop</h2>
+                      <p className="text-white/80 text-xs sm:text-sm">Customize your experience</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-5 py-2">
-                    <Coins className="w-6 h-6 text-white" />
+                  <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5 sm:px-5 sm:py-2">
+                    <Coins className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                     <div className="text-white text-right">
-                      <div className="text-2xl font-bold">{gamificationData?.coins ?? 0}</div>
-                      <div className="text-xs">Coins</div>
+                      <div className="text-lg sm:text-2xl font-bold">{gamificationData?.coins ?? 0}</div>
+                      <div className="text-[10px] sm:text-xs">Coins</div>
                     </div>
                   </div>
                 </div>

@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import "@/index.css";
 import App from "@/App";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/lib/ThemeContext";
 
 // Expose a minimal `process.env` shim for legacy code that still uses
 // process.env.REACT_APP_BACKEND_URL so files across the repo don't throw
@@ -19,7 +20,9 @@ if (typeof window !== 'undefined') {
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <App />
-    <Toaster position="top-right" richColors />
+    <ThemeProvider>
+      <App />
+      <Toaster position="top-right" richColors />
+    </ThemeProvider>
   </React.StrictMode>,
 );

@@ -82,18 +82,18 @@ const HabitManagement = ({ user, onLogout }) => {
   return (
     <Layout user={user} onLogout={onLogout} role="user">
       <div className="container space-y-6 mt-5" data-testid="habit-management-page">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-4xl font-bold text-slate-800" style={{ fontFamily: 'Rethink Sans, sans-serif' }}>My Habits</h1>
             <p className="text-slate-600 mt-1" style={{ fontFamily: 'Spectral, serif' }}>Build and track your daily routines</p>
           </div>
           <div>
             <Button
-              className="gap-2 bg-gradient-to-br from-emerald-500 to-teal-600 text-white hover:opacity-95"
+              className="gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md hover:shadow-lg hover:opacity-90 transition-all duration-200 whitespace-nowrap"
               data-testid="open-add-habit-dialog"
               onClick={() => setDialogOpen(true)}
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 shrink-0" />
               Add New Habit
             </Button>
 

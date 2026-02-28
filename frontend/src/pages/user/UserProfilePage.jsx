@@ -228,18 +228,31 @@ const UserProfilePage = ({ user, onLogout }) => {
                 <div className="flex gap-2 flex-shrink-0">
                   {editing ? (
                     <>
-                      <Button onClick={handleSubmit} disabled={loading} size="sm">
-                        <Save className="w-4 h-4 mr-2" />
+                      <Button
+                        onClick={handleSubmit}
+                        disabled={loading}
+                        size="sm"
+                        className="gap-2 px-4 py-2 bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white border-0 rounded-lg shadow font-semibold transition-all duration-200"
+                      >
+                        <Save className="w-4 h-4" />
                         Save
                       </Button>
-                      <Button onClick={() => setEditing(false)} variant="outline" size="sm">
-                        <X className="w-4 h-4 mr-2" />
+                      <Button
+                        onClick={() => setEditing(false)}
+                        size="sm"
+                        className="gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg font-semibold shadow-sm transition-all duration-200"
+                      >
+                        <X className="w-4 h-4" />
                         Cancel
                       </Button>
                     </>
                   ) : (
-                    <Button onClick={() => setEditing(true)} variant="outline" size="sm">
-                      <Edit2 className="w-4 h-4 mr-2" />
+                    <Button
+                      onClick={() => setEditing(true)}
+                      size="sm"
+                      className="gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white border-0 rounded-lg shadow font-semibold transition-all duration-200"
+                    >
+                      <Edit2 className="w-4 h-4" />
                       Edit Profile
                     </Button>
                   )}

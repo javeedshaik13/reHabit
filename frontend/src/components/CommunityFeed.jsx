@@ -106,7 +106,7 @@ const PostCard = ({ post, onReact, onComment, token }) => {
       animate={{ opacity: 1, y: 0 }}
       className="mb-4"
     >
-      <Card className="p-6 bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 border border-amber-200">
+      <Card className="p-4 sm:p-6 bg-gradient-to-br from-orange-50 via-amber-50 to-orange-100 border border-amber-200">
         {/* Header */}
         <div className="flex items-start gap-3 mb-4">
           <Avatar className="w-12 h-12 ring-2 ring-emerald-200">
@@ -176,7 +176,7 @@ const PostCard = ({ post, onReact, onComment, token }) => {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1 sm:gap-2">
           <div className="relative">
             <Button
               variant="ghost"
@@ -525,7 +525,7 @@ const CommunityFeed = ({ communityId, token, user }) => {
       {/* Main feed column */}
       <div className="lg:col-span-2">
       {/* Create Post */}
-      <Card className="p-6 mb-6 bg-gradient-to-br from-white via-slate-50 to-slate-100 border border-slate-200 shadow-sm">
+      <Card className="p-4 sm:p-6 mb-6 bg-gradient-to-br from-white via-slate-50 to-slate-100 border border-slate-200 shadow-sm">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-emerald-600" />
           Share Your Progress
@@ -538,11 +538,11 @@ const CommunityFeed = ({ communityId, token, user }) => {
           className="mb-3 min-h-[120px]"
         />
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <select
             value={postType}
             onChange={(e) => setPostType(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            className="flex-1 min-w-[120px] px-3 py-2 border border-gray-300 rounded-lg text-sm"
           >
             <option value="general">General</option>
             <option value="progress">Progress Update</option>
@@ -551,7 +551,7 @@ const CommunityFeed = ({ communityId, token, user }) => {
             <option value="milestone">Milestone</option>
           </select>
 
-          <Button onClick={handleCreatePost} className="ml-auto gap-2">
+          <Button onClick={handleCreatePost} className="gap-2 whitespace-nowrap">
             <Send className="w-4 h-4" />
             Share Post
           </Button>

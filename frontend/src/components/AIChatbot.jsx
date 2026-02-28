@@ -241,7 +241,7 @@ export const AIChatbotButton = ({ onClick }) => {
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
       onClick={onClick}
-      className="fixed bottom-6 right-6 bg-gradient-to-br from-emerald-500 to-teal-600 p-5 rounded-full shadow-xl shadow-emerald-500/40 z-40 group hover:shadow-2xl hover:shadow-emerald-500/60"
+      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-gradient-to-br from-emerald-500 to-teal-600 p-3 sm:p-5 rounded-full shadow-xl shadow-emerald-500/40 z-40 group hover:shadow-2xl hover:shadow-emerald-500/60"
       animate={{
         boxShadow: [
           '0 10px 30px rgba(16, 185, 129, 0.4)',
@@ -251,7 +251,7 @@ export const AIChatbotButton = ({ onClick }) => {
       }}
       transition={{ duration: 2, repeat: Infinity }}
     >
-      <Bot className="w-7 h-7 text-white drop-shadow-lg group-hover:animate-bounce" />
+      <Bot className="w-5 h-5 sm:w-7 sm:h-7 text-white drop-shadow-lg group-hover:animate-bounce" />
       <motion.div
         className="absolute -top-1 -right-1 w-3 h-3 bg-amber-400 rounded-full shadow-lg"
         animate={{ scale: [1, 1.3, 1] }}

@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Zap, Menu, X, LogOut, Map } from 'lucide-react';
+import { Zap, Menu, X, LogOut, Map, Sun, Moon } from 'lucide-react';
 import ProgressMapContainer from '@/components/progress-map/ProgressMapContainer_v2';
 import { Button } from '@/components/ui/button';
+import { useTheme } from '@/lib/ThemeContext';
 
 // props:
 // - items: [{ path, label }]
@@ -11,14 +12,22 @@ import { Button } from '@/components/ui/button';
 // - cta?: { label: string, href?: string, onClick?: () => void }
 const TopNavbar = ({ items = [], brandHref = '/', cta, onLogout, user }) => {
   const location = useLocation();
+  const { theme, toggleTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const navRef = useRef(null);
   const [highlightStyle, setHighlightStyle] = useState(null);
   const [showProgressMap, setShowProgressMap] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [ripples, setRipples] = useState([]);
   const [particles, setParticles] = useState([]);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [hoveredItem, setHoveredItem] = useState(null);
+
+  // Scroll lock when mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
 
   // Check for openMap query parameter and auto-open progress map
   useEffect(() => {
@@ -112,7 +121,7 @@ const TopNavbar = ({ items = [], brandHref = '/', cta, onLogout, user }) => {
     if (onLogout) {
       return (
         <button
-          onClick={onLogout}
+          onClick={() => setShowLogoutConfirm(true)}
           className="group relative inline-flex items-center justify-center rounded-full bg-gradient-to-r from-slate-800 to-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-500/20 transition-all duration-300 hover:shadow-xl hover:shadow-slate-500/30 hover:scale-105 active:scale-95 overflow-hidden"
         >
           <span className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
@@ -286,8 +295,17 @@ const TopNavbar = ({ items = [], brandHref = '/', cta, onLogout, user }) => {
               })}
             </nav>
 
-            {/* Right: CTA (Desktop only) */}
-            <div className="hidden md:block pl-2 relative z-10">{renderCTA()}</div>
+            {/* Right: Theme Toggle + CTA (Desktop only) */}
+            <div className="hidden md:flex items-center gap-2 pl-2 relative z-10">
+              <button
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200/60 bg-white/60 hover:bg-slate-50 text-slate-600 transition-all duration-200 hover:scale-110 active:scale-95 shadow-sm"
+              >
+                {theme === 'dark' ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4" />}
+              </button>
+              {renderCTA()}
+            </div>
           </div>
         </div>
       </div>
@@ -320,6 +338,13 @@ const TopNavbar = ({ items = [], brandHref = '/', cta, onLogout, user }) => {
                 className="inline-flex h-10 w-10 items-center justify-center rounded-xl hover:bg-slate-100 text-slate-600 transition-all duration-200 hover:scale-110 active:scale-95"
               >
                 <X className="h-5 w-5" />
+              </button>
+              <button
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl hover:bg-slate-100 text-slate-600 transition-all duration-200 hover:scale-110 active:scale-95"
+              >
+                {theme === 'dark' ? <Sun className="h-5 w-5 text-amber-400" /> : <Moon className="h-5 w-5" />}
               </button>
             </div>
             <nav className="p-4 flex flex-col gap-2 overflow-y-auto">
@@ -370,7 +395,7 @@ const TopNavbar = ({ items = [], brandHref = '/', cta, onLogout, user }) => {
                 <button
                   onClick={() => {
                     setIsOpen(false);
-                    onLogout();
+                    setShowLogoutConfirm(true);
                   }}
                   className="group relative mt-4 rounded-xl bg-gradient-to-r from-red-500 to-rose-500 px-5 py-4 text-sm font-semibold text-white transition-all duration-300 hover:shadow-xl hover:shadow-red-500/30 flex items-center justify-center gap-2 overflow-hidden hover:scale-105 active:scale-95"
                 >
@@ -417,6 +442,42 @@ const TopNavbar = ({ items = [], brandHref = '/', cta, onLogout, user }) => {
               user={user} 
               currentUserId={user?._id}
             />
+          </div>
+        </div>
+      )}    
+
+      {/* Logout Confirmation Dialog */}
+      {showLogoutConfirm && (
+        <div
+          className="fixed inset-0 z-[999] flex items-center justify-center p-4"
+          style={{ background: 'rgba(15,23,42,0.5)', backdropFilter: 'blur(4px)' }}
+          onClick={() => setShowLogoutConfirm(false)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-[260px] sm:max-w-sm mx-auto p-4 sm:p-8 flex flex-col items-center gap-2 sm:gap-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-red-50 flex items-center justify-center mb-0.5 sm:mb-1">
+              <LogOut className="w-5 h-5 sm:w-7 sm:h-7 text-red-500" />
+            </div>
+            <h2 className="text-base sm:text-xl font-bold text-slate-800">Sign out?</h2>
+            <p className="text-slate-500 text-xs sm:text-sm text-center">
+              Are you sure you want to log out?
+            </p>
+            <div className="flex gap-2 sm:gap-3 w-full mt-1 sm:mt-2">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="flex-1 py-2 sm:py-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold text-xs sm:text-sm transition-all duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => { setShowLogoutConfirm(false); onLogout(); }}
+                className="flex-1 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white font-semibold text-xs sm:text-sm shadow-md shadow-red-500/30 transition-all duration-200"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       )}

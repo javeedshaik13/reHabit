@@ -295,22 +295,22 @@ const CommunityPage = ({ user, onLogout }) => {
 
   return (
     <Layout user={user} onLogout={onLogout} role="user">
-      <div className="space-y-6 mt-5" data-testid="community-page">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4 sm:space-y-6 mt-3 sm:mt-5 px-1 sm:px-0" data-testid="community-page">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-slate-800" style={{ fontFamily: 'Rethink Sans, sans-serif' }}>Community</h1>
-            <p className="text-slate-600 mt-1" style={{ fontFamily: 'Spectral, serif' }}>Connect with others on their habit journey</p>
+            <h1 className="text-2xl sm:text-4xl font-bold text-slate-800" style={{ fontFamily: 'Rethink Sans, sans-serif' }}>Community</h1>
+            <p className="text-slate-600 mt-0.5 text-xs sm:text-base" style={{ fontFamily: 'Spectral, serif' }}>Connect with others on their habit journey</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button
-                  className="group gap-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:via-teal-600 hover:to-emerald-700 text-white px-5 py-3 rounded-xl shadow-sm hover:shadow-md transition-all border border-emerald-500/30"
+                  className="group gap-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:via-teal-600 hover:to-emerald-700 text-white px-3 py-2 sm:px-5 sm:py-3 text-sm sm:text-base rounded-xl shadow-sm hover:shadow-md transition-all border border-emerald-500/30"
                   data-testid="create-community-btn"
                 >
-                  <span className="flex items-center gap-2">
-                    <Plus className="w-4 h-4 transition-transform group-hover:scale-110" />
-                    <span className="font-semibold tracking-wide">Create Community</span>
+                  <span className="flex items-center gap-1.5">
+                    <Plus className="w-4 h-4 transition-transform group-hover:scale-110 shrink-0" />
+                    <span className="font-semibold tracking-wide whitespace-nowrap">+ Community</span>
                   </span>
                 </Button>
               </DialogTrigger>
@@ -378,11 +378,11 @@ const CommunityPage = ({ user, onLogout }) => {
           <Dialog open={challengeDialogOpen} onOpenChange={setChallengeDialogOpen}>
             <DialogTrigger asChild>
               <Button
-                className="group gap-2 bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 hover:from-amber-600 hover:via-yellow-600 hover:to-orange-600 text-white px-5 py-3 rounded-xl shadow-sm hover:shadow-md transition-all border border-amber-500/30"
+                className="group gap-1.5 bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 hover:from-amber-600 hover:via-yellow-600 hover:to-orange-600 text-white px-3 py-2 sm:px-5 sm:py-3 text-sm sm:text-base rounded-xl shadow-sm hover:shadow-md transition-all border border-amber-500/30"
               >
-                <span className="flex items-center gap-2">
-                  <Trophy className="w-4 h-4 transition-transform group-hover:scale-110" />
-                  <span className="font-semibold tracking-wide">Create Challenge</span>
+                <span className="flex items-center gap-1.5">
+                  <Trophy className="w-4 h-4 transition-transform group-hover:scale-110 shrink-0" />
+                  <span className="font-semibold tracking-wide whitespace-nowrap">+ Challenge</span>
                 </span>
               </Button>
             </DialogTrigger>
@@ -530,12 +530,12 @@ const CommunityPage = ({ user, onLogout }) => {
         </div>
 
         <Tabs defaultValue="feed" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="feed" data-testid="feed-tab">Feed</TabsTrigger>
-            <TabsTrigger value="groups" data-testid="groups-tab">Groups</TabsTrigger>
-            <TabsTrigger value="studios" data-testid="studios-tab">Studios</TabsTrigger>
-            <TabsTrigger value="challenges" data-testid="challenges-tab">Challenges</TabsTrigger>
-            <TabsTrigger value="friends" data-testid="friends-tab">Friends</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 h-auto p-1 gap-0.5">
+            <TabsTrigger value="feed" data-testid="feed-tab" className="text-xs sm:text-sm px-1 py-1.5 sm:px-3">Feed</TabsTrigger>
+            <TabsTrigger value="groups" data-testid="groups-tab" className="text-xs sm:text-sm px-1 py-1.5 sm:px-3">Groups</TabsTrigger>
+            <TabsTrigger value="studios" data-testid="studios-tab" className="text-xs sm:text-sm px-1 py-1.5 sm:px-3">Studios</TabsTrigger>
+            <TabsTrigger value="challenges" data-testid="challenges-tab" className="text-xs sm:text-sm px-1 py-1.5 sm:px-3"><span className="sm:hidden">Chall.</span><span className="hidden sm:inline">Challenges</span></TabsTrigger>
+            <TabsTrigger value="friends" data-testid="friends-tab" className="text-xs sm:text-sm px-1 py-1.5 sm:px-3">Friends</TabsTrigger>
           </TabsList>
 
           <TabsContent value="feed" className="mt-6">
@@ -557,7 +557,7 @@ const CommunityPage = ({ user, onLogout }) => {
                       {joinedGroups.length}
                     </span>
                   </h3>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {joinedGroups.map((community) => {
                       const communityId = community._id || community.id;
                       return (
@@ -612,7 +612,7 @@ const CommunityPage = ({ user, onLogout }) => {
                     </Badge>
                   </div>
                   <p className="text-sm text-slate-600 mb-4">Communities that match your interests and activity patterns</p>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {recommendedCommunities.map((community) => {
                       const communityId = community._id || community.id;
                       const matchScore = community.matchScore || 85;
@@ -677,7 +677,7 @@ const CommunityPage = ({ user, onLogout }) => {
                       </CardContent>
                     </Card>
                   ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                       {otherCommunities.map((community) => {
                         const communityId = community._id || community.id;
                         return (
@@ -730,7 +730,7 @@ const CommunityPage = ({ user, onLogout }) => {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {allChallenges.map((challenge) => {
                   const isParticipating = challenge.participants?.some(p => p.userId === user?.id || p.userId?._id === user?.id);
                   const daysLeft = Math.ceil((new Date(challenge.endDate) - new Date()) / (1000 * 60 * 60 * 24));
